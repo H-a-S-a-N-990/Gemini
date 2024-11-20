@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const { Client, GatewayIntentBits, MessageAttachment } = require('discord.js');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenerativeAI } = require('@google/generativeai');
 
 const client = new Client({
     intents: [
@@ -27,11 +27,13 @@ client.on('messageCreate', async (message) => {
         const response = await model.generateText(prompt);
         message.channel.send(response.text);
     } else if (message.content === '!sendFile') {
-        
+        const attachment = new MessageAttachment('./your_file.txt'); // Replace with your file path
+        await message.channel.send({ files: [attachment] });
     } else if (message.content.startsWith('!hello')) {
-        
+        await message.channel.send('Hello, world!');
     } else if (message.content.startsWith('!repeat')) {
-        
+        const messageContent = message.content.slice(7);
+        await message.channel.send(messageContent);
     }
 });
 
