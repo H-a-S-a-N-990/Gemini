@@ -2,14 +2,13 @@
   "name": "your-project-name",
   "version": "1.0.0",
   "description": "Your project description",
-  "main": "index.js",
+  "main": "index.js", // Replace 'index.js' with your main file
   "scripts": {
     "start": "node index.js"
   },
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^14.19.1",
-    "@google/generativeai": "^1.0.0"
+    "discord.js": "^14.19.1" // Include other necessary dependencies
   }
 }
