@@ -1,40 +1,45 @@
 require('dotenv').config();
+const { Client, GatewayIntentBits } = require('discord.js');
+const { TextServiceClient } = require('@google/generative-ai');
 
-const { Client, GatewayIntentBits, MessageAttachment } = require('discord.js');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
+// Initialize Discord Client
 const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-    ],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
 });
 
-const model = new GoogleGenerativeAI({
-    apiKey: process.env.GEMINI_API_KEY,
+// Initialize Google Generative AI Client
+const generativeAiClient = new TextServiceClient({
+  apiKey: process.env.GOOGLE_API_KEY,
 });
 
+// Bot Ready Event
 client.once('ready', () => {
-    console.log('Ready!');
+  console.log(`Bot logged in as ${client.user.tag}!`);
 });
 
+// Message Handling
 client.on('messageCreate', async (message) => {
-    if (message.author.bot) return;
+  // Ignore bot messages
+  if (message.author.bot) return;
 
-    if (message.content.startsWith('!ask')) {
-        const prompt = message.content.slice(5).trim();
-        const response = await model.generateText(prompt);
-        message.channel.send(response.text);
-    } else if (message.content === '!sendFile') {
-        const attachment = new MessageAttachment('./your_file.txt'); // Replace with your file path
-        await message.channel.send({ files: [attachment] });
-    } else if (message.content.startsWith('!hello')) {
-        await message.channel.send('Hello, world!');
-    } else if (message.content.startsWith('!repeat')) {
-        const messageContent = message.content.slice(7);
-        await message.channel.send(messageContent);
+  // Trigger AI response with !ai command
+  if (message.content.startsWith('!ai ')) {
+    const prompt = message.content.slice(4).trim();
+    if (!prompt) return message.reply("Please provide a prompt for the AI!");
+
+    try {
+      const [response] = await generativeAiClient.generateText({
+        prompt: { text: prompt },
+      });
+
+      const reply = response.candidates[0]?.text || "Sorry, I couldn't generate a response.";
+      message.reply(reply);
+    } catch (error) {
+      console.error("Error with Generative AI:", error);
+      message.reply("An error occurred while generating the response.");
     }
+  }
 });
 
+// Log in to Discord
 client.login(process.env.DISCORD_TOKEN);
