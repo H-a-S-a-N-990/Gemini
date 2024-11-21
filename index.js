@@ -1,45 +1,39 @@
-require('dotenv').config();
-const { Client, GatewayIntentBits } = require('discord.js');
-const { TextServiceClient } = require('@google/generative-ai');
+const { Client, GatewayIntentBits } = require("discord.js");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+require("dotenv").config();
 
-// Initialize Discord Client
+// Discord bot setup
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
 });
 
-// Initialize Google Generative AI Client
-const generativeAiClient = new TextServiceClient({
-  apiKey: process.env.GOOGLE_API_KEY,
-});
+// Initialize Google Generative AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Bot Ready Event
-client.once('ready', () => {
-  console.log(`Bot logged in as ${client.user.tag}!`);
-});
-
-// Message Handling
-client.on('messageCreate', async (message) => {
-  // Ignore bot messages
-  if (message.author.bot) return;
-
-  // Trigger AI response with !ai command
-  if (message.content.startsWith('!ai ')) {
-    const prompt = message.content.slice(4).trim();
-    if (!prompt) return message.reply("Please provide a prompt for the AI!");
-
+client.on("messageCreate", async (message) => {
+  // Check if the message starts with "!ai "
+  if (message.content.startsWith("!ai ")) {
+    const prompt = message.content.slice(4).trim(); // Extract the prompt
     try {
-      const [response] = await generativeAiClient.generateText({
-        prompt: { text: prompt },
-      });
+      // Call the Gemini model
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const result = await model.generateContent([prompt]);
 
-      const reply = response.candidates[0]?.text || "Sorry, I couldn't generate a response.";
-      message.reply(reply);
+      // Send the result back to Discord
+      if (result.response?.text) {
+        message.reply(result.response.text());
+      } else {
+        message.reply("I couldn't generate a response.");
+      }
     } catch (error) {
-      console.error("Error with Generative AI:", error);
-      message.reply("An error occurred while generating the response.");
+      console.error("Error generating AI response:", error);
+      message.reply("There was an error generating a response.");
     }
   }
 });
 
-// Log in to Discord
 client.login(process.env.DISCORD_TOKEN);
