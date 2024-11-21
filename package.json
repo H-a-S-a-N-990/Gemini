@@ -1,15 +1,21 @@
 {
-  "name": "your-project-name",
+  "name": "discord-generative-ai-bot",
   "version": "1.0.0",
-  "description": "Your project description",
+  "description": "A Discord bot using discord.js, dotenv, and Google Generative AI",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
+  "keywords": ["discord", "generative-ai", "dotenv", "google"],
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^14.19.1",
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.0.3",
     "@google/generative-ai": "^1.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
   }
 }
