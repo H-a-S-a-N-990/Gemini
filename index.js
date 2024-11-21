@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const { Client, GatewayIntentBits, MessageAttachment } = require('discord.js');
-const { GoogleGenerativeAI } = require('@google/generativeai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const client = new Client({
     intents: [
