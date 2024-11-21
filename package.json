@@ -9,6 +9,7 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^14.19.1"
+    "discord.js": "^14.19.1",
+    "@google/generative-ai": "^1.0.0"
   }
 }
